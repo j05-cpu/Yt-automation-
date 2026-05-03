@@ -1,0 +1,60 @@
+name: Marketing Bot
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  capture-and-process:
+    runs-on: ubuntu-latest
+    env:
+      APP_URL: ${{ secrets.APP_URL }}
+      CAPTION: ${{ secrets.CAPTION || 'Ab AI automation hua aur bhi asaan!' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      
+      - name: Install Node.js dependencies
+        run: npm install playwright
+      
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+      
+      - name: Install Python Watchdog
+        run: pip install watchdog
+      
+      - name: Run capture
+        run: node capture.js
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+      
+      - name: Run video editor
+        run: python editor.py
+        env:
+          CAPTION: ${{ secrets.CAPTION || 'Ab AI automation hua aur bhi asaan!' }}
+      
+      - name: Upload marketing video
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketing_ready
+          path: recordings/marketing_ready.*
+          retention-days: 30

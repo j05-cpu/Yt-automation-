@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Recordings (large video files)
+recordings/*.webm
+recordings/*.mp4
+recordings/*.mp3
+
+# Cache
+.cache/
