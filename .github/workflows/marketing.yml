@@ -8,9 +8,6 @@ on:
 jobs:
   capture-and-process:
     runs-on: ubuntu-latest
-    env:
-      APP_URL: ${{ secrets.APP_URL }}
-      CAPTION: ${{ secrets.CAPTION || 'Ab AI automation hua aur bhi asaan!' }}
     
     steps:
       - name: Checkout code
@@ -43,14 +40,16 @@ jobs:
         run: pip install watchdog
       
       - name: Run capture
-        run: node capture.js
-        env:
-          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          export APP_URL="${{ secrets.APP_URL || 'https://f21467cc-364a-4249-bae9-b4e193ff390f-00-yzv5rigbah39.pike.replit.dev/' }}"
+          echo "Using APP_URL: $APP_URL"
+          node capture.js
       
       - name: Run video editor
-        run: python editor.py
-        env:
-          CAPTION: ${{ secrets.CAPTION || 'Ab AI automation hua aur bhi asaan!' }}
+        run: |
+          export CAPTION="${{ secrets.CAPTION || 'Ab AI automation hua aur bhi asaan!' }}"
+          echo "Using CAPTION: $CAPTION"
+          python editor.py
       
       - name: Upload marketing video
         uses: actions/upload-artifact@v4
