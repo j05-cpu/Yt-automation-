@@ -20,8 +20,18 @@ if (!fs.existsSync(RECORDINGS_DIR)) {
 }
 
 async function performHumanLikeActions(page) {
-  // Wait for page to load
+  // Wait for the main app container to load
+  console.log('Waiting for app to load...');
+  try {
+    await page.waitForSelector('#root', { timeout: 30000 });
+    console.log('App container #root found');
+  } catch (e) {
+    console.log('Warning: #root not found, continuing...');
+  }
+  
+  // Wait for network to settle
   await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(3000);
   
   // Scroll through the features
   console.log('Scrolling through features...');
@@ -44,16 +54,20 @@ async function performHumanLikeActions(page) {
   if (adminLink) {
     try {
       await adminLink.click();
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(3000);
       console.log('Clicked Admin Dashboard');
     } catch (e) {
       console.log('Admin Dashboard not found, clicking first link');
     }
   }
   
+  // Wait for API key content to load
+  console.log('Waiting for content to render...');
+  await page.waitForTimeout(3000);
+  
   // Simulate API key management demonstration
   console.log('Simulating API key management...');
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(5000);
 }
 
 async function captureScreen() {
